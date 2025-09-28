@@ -12,7 +12,7 @@ This system allows institutions to issue, store, and verify certificates securel
 - Private blockchain implementation (no smart contracts).  
 - User-friendly web interface using HTML and CSS.  
 - SQL database integration for efficient certificate management.  
-- Lightweight and easy to deploy on Linux Mint.  
+- Lightweight and easy to deploy.  
 
 ---
 
@@ -21,8 +21,7 @@ This system allows institutions to issue, store, and verify certificates securel
 - **Backend:** Python Flask  
 - **Frontend:** HTML, CSS  
 - **Database:** SQL (MySQL/PostgreSQL/SQLite)  
-- **Version Control:** Git  
-- **OS:** Linux Mint (tested)  
+- **Version Control:** Git (first experience setting up SSH and GitHub on Linux Mint)  
 
 ---
 
