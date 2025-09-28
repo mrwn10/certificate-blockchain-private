@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Certificate Blockchain System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Certificate Blockchain System</h1>
+            <p>Secure and verifiable digital certificates</p>
+        </header>
+        
+        <nav class="nav">
+            <a href="{{ url_for('create_cert.homepage') }}" class="nav-link active">Home</a>
+            <a href="{{ url_for('create_cert.verify_certificate') }}" class="nav-link">Verify Certificate</a>
+            <a href="{{ url_for('create_cert.view_certificate') }}" class="nav-link">View Certificates</a>
+        </nav>
+        
+        <main class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="messages">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <div class="content-grid">
+                <section class="create-certificate">
+                    <h2>Create New Certificate</h2>
+                    <form method="POST" action="{{ url_for('create_cert.create_certificate') }}" class="certificate-form">
+                        <div class="form-group">
+                            <label for="student_name">Student Name:</label>
+                            <input type="text" id="student_name" name="student_name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="course">Course:</label>
+                            <input type="text" id="course" name="course" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Create Certificate</button>
+                    </form>
+                </section>
+                
+                <section class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <div class="action-buttons">
+                        <a href="{{ url_for('create_cert.verify_certificate') }}" class="action-link">
+                            <div class="action-card">
+                                <span class="action-icon">✓</span>
+                                <span class="action-text">Verify Existing Certificate</span>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('create_cert.view_certificate') }}" class="action-link">
+                            <div class="action-card">
+                                <span class="action-icon">👁️</span>
+                                <span class="action-text">View All Certificates</span>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+            </div>
+        </main>
+        
+        <footer class="footer">
+            <p>&copy; 2025 Certificate Blockchain System. All rights reserved.</p>
+        </footer>
+    </div>
+</body>
+</html>

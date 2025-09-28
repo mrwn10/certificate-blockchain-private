@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Certificate - Certificate Blockchain System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/verify_certificate.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Verify Certificate Authenticity</h1>
+            <p>Check the validity of any certificate in the blockchain</p>
+        </header>
+        
+        <nav class="nav">
+            <a href="{{ url_for('create_cert.homepage') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('create_cert.verify_certificate') }}" class="nav-link active">Verify Certificate</a>
+            <a href="{{ url_for('create_cert.view_certificate') }}" class="nav-link">View Certificates</a>
+        </nav>
+        
+        <main class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="messages">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <div class="content-grid">
+                <section class="create-certificate">
+                    <h2>Verify Certificate</h2>
+                    <form method="POST" class="certificate-form" id="verifyForm">
+                        <div class="form-group">
+                            <label for="certificate_id">Certificate ID:</label>
+                            <input type="text" id="certificate_id" name="certificate_id" placeholder="Enter Certificate ID">
+                        </div>
+                        
+                        <div class="form-divider">
+                            <span>OR</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="certificate_hash">Certificate Hash:</label>
+                            <input type="text" id="certificate_hash" name="certificate_hash" placeholder="Enter Certificate Hash">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" id="verifyButton">
+                            <span class="btn-icon">🔍</span>
+                            <span id="buttonText">Verify Certificate</span>
+                            <div id="loadingSpinner" class="loading-spinner" style="display: none;"></div>
+                        </button>
+                    </form>
+                </section>
+                
+                <section class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <div class="action-buttons">
+                        <a href="{{ url_for('create_cert.homepage') }}" class="action-link">
+                            <div class="action-card">
+                                <span class="action-icon">🏠</span>
+                                <span class="action-text">Back to Home</span>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('create_cert.view_certificate') }}" class="action-link">
+                            <div class="action-card">
+                                <span class="action-icon">👁️</span>
+                                <span class="action-text">View All Certificates</span>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+            </div>
+            
+            <!-- Sample Verification Preview (Static) -->
+            <div class="verification-preview">
+                <h3>How Verification Results Will Look</h3>
+                <div class="preview-card">
+                    <div class="status-card status-valid">
+                        <div class="status-icon">✓</div>
+                        <div class="status-content">
+                            <h3>VALID CERTIFICATE</h3>
+                            <p>This certificate has been verified against the blockchain</p>
+                        </div>
+                    </div>
+                    <div class="preview-note">
+                        <p>After verification, you'll see detailed certificate information here including student name, course, hash values, and blockchain status.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dynamic Results Container -->
+            <div id="dynamicResultsContainer"></div>
+            
+            {% if certificate %}
+            <section class="verification-results">
+                <h2>Verification Results</h2>
+                
+                <div class="status-card {% if certificate.is_valid %}status-valid{% else %}status-invalid{% endif %}">
+                    <div class="status-icon">
+                        {% if certificate.is_valid %}✓{% else %}✗{% endif %}
+                    </div>
+                    <div class="status-content">
+                        <h3>{% if certificate.is_valid %}VALID CERTIFICATE{% else %}INVALID CERTIFICATE{% endif %}</h3>
+                        <p>This certificate has been verified against the blockchain</p>
+                    </div>
+                </div>
+                
+                <div class="certificate-details">
+                    <h3>Certificate Details</h3>
+                    <div class="details-grid">
+                        <div class="detail-card">
+                            <span class="detail-label">Certificate ID</span>
+                            <span class="detail-value">{{ certificate.id }}</span>
+                        </div>
+                        <div class="detail-card">
+                            <span class="detail-label">Student Name</span>
+                            <span class="detail-value">{{ certificate.student_name }}</span>
+                        </div>
+                        <div class="detail-card">
+                            <span class="detail-label">Course</span>
+                            <span class="detail-value">{{ certificate.course }}</span>
+                        </div>
+                        <div class="detail-card">
+                            <span class="detail-label">Issued Date</span>
+                            <span class="detail-value">{{ certificate.issued_date }}</span>
+                        </div>
+                        <div class="detail-card full-width">
+                            <span class="detail-label">Certificate Hash</span>
+                            <span class="detail-value hash-value">{{ certificate.certificate_hash }}</span>
+                        </div>
+                        <div class="detail-card full-width">
+                            <span class="detail-label">Previous Block Hash</span>
+                            <span class="detail-value hash-value">{{ certificate.previous_hash }}</span>
+                        </div>
+                        <div class="detail-card">
+                            <span class="detail-label">Block Timestamp</span>
+                            <span class="detail-value">{{ certificate.block_timestamp }}</span>
+                        </div>
+                        <div class="detail-card">
+                            <span class="detail-label">Blockchain Length</span>
+                            <span class="detail-value">{{ certificate.chain_length }} blocks</span>
+                        </div>
+                        <div class="detail-card">
+                            <span class="detail-label">Blockchain Linkage</span>
+                            <span class="detail-value status-{% if certificate.is_linked %}linked{% else %}not-linked{% endif %}">
+                                {% if certificate.is_linked %}✓ Properly Linked{% else %}✗ Not Linked{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+        </main>
+        
+        <footer class="footer">
+            <p>&copy; 2025 Certificate Blockchain System. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+    document.getElementById('verifyForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const certificateId = document.getElementById('certificate_id').value.trim();
+        const certificateHash = document.getElementById('certificate_hash').value.trim();
+        
+        // Check if both fields are empty
+        if (!certificateId && !certificateHash) {
+            alert('Please enter either Certificate ID or Certificate Hash');
+            return false;
+        }
+        
+        // If both fields are filled, clear the hash field and proceed with ID
+        if (certificateId && certificateHash) {
+            document.getElementById('certificate_hash').value = '';
+        }
+        
+        // Show loading state
+        const verifyButton = document.getElementById('verifyButton');
+        const buttonText = document.getElementById('buttonText');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        
+        verifyButton.disabled = true;
+        buttonText.textContent = 'Verifying...';
+        loadingSpinner.style.display = 'inline-block';
+        
+        try {
+            const formData = new FormData();
+            if (certificateId) formData.append('certificate_id', certificateId);
+            if (certificateHash) formData.append('certificate_hash', certificateHash);
+            
+            const response = await fetch('{{ url_for("create_cert.verify_certificate") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                displayVerificationResult(result.certificate);
+            } else {
+                showError(result.message);
+            }
+            
+        } catch (error) {
+            console.error('Verification failed:', error);
+            showError('Verification failed: ' + error.message);
+        } finally {
+            // Reset button state
+            verifyButton.disabled = false;
+            buttonText.textContent = 'Verify Certificate';
+            loadingSpinner.style.display = 'none';
+        }
+    });
+    
+    function displayVerificationResult(certificate) {
+        const container = document.getElementById('dynamicResultsContainer');
+        
+        const statusClass = certificate.is_valid ? 'status-valid' : 'status-invalid';
+        const statusIcon = certificate.is_valid ? '✓' : '✗';
+        const statusText = certificate.is_valid ? 'VALID CERTIFICATE' : 'INVALID CERTIFICATE';
+        const linkageClass = certificate.is_linked ? 'status-linked' : 'status-not-linked';
+        const linkageText = certificate.is_linked ? '✓ Properly Linked' : '✗ Not Linked';
+        
+        container.innerHTML = `
+            <section class="verification-results">
+                <h2>Verification Results</h2>
+                
+                <div class="status-card ${statusClass}">
+                    <div class="status-icon">${statusIcon}</div>
+                    <div class="status-content">
+                        <h3>${statusText}</h3>
+                        <p>This certificate has been verified against the blockchain</p>
+                    </div>
+                </div>
+                
+                <div class="certificate-details">
+                    <h3>Certificate Details</h3>
+                    <div class="details-grid">
+                        <div class="detail-card">
+                            <span class="detail-label">Certificate ID</span>
+                            <span class="detail-value">${certificate.id}</span>
+                        </div>
+                        <div class="detail-card">
+                            <span class="detail-label">Student Name</span>
+                            <span class="detail-value">${certificate.student_name}</span>
+                        </div>
+                        <div class="detail-card">
+                            <span class="detail-label">Course</span>
+                            <span class="detail-value">${certificate.course}</span>
+                        </div>
+                        <div class="detail-card">
+                            <span class="detail-label">Issued Date</span>
+                            <span class="detail-value">${certificate.issued_date}</span>
+                        </div>
+                        <div class="detail-card full-width">
+                            <span class="detail-label">Certificate Hash</span>
+                            <span class="detail-value hash-value">${certificate.certificate_hash}</span>
+                        </div>
+                        <div class="detail-card full-width">
+                            <span class="detail-label">Previous Block Hash</span>
+                            <span class="detail-value hash-value">${certificate.previous_hash}</span>
+                        </div>
+                        <div class="detail-card">
+                            <span class="detail-label">Block Timestamp</span>
+                            <span class="detail-value">${certificate.block_timestamp}</span>
+                        </div>
+                        <div class="detail-card">
+                            <span class="detail-label">Blockchain Length</span>
+                            <span class="detail-value">${certificate.chain_length} blocks</span>
+                        </div>
+                        <div class="detail-card">
+                            <span class="detail-label">Blockchain Linkage</span>
+                            <span class="detail-value ${linkageClass}">${linkageText}</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        `;
+        
+        // Scroll to results
+        container.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function showError(message) {
+        const container = document.getElementById('dynamicResultsContainer');
+        container.innerHTML = `
+            <div class="alert alert-error" style="margin-top: 20px;">
+                ${message}
+            </div>
+        `;
+        
+        container.scrollIntoView({ behavior: 'smooth' });
+    }
+    </script>
+</body>
+</html>

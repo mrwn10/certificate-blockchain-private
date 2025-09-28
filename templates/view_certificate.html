@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Certificates</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 40px; 
+            background-color: #f5f5f5;
+        }
+        .nav { 
+            margin-bottom: 30px; 
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .nav a { 
+            margin-right: 20px; 
+            text-decoration: none; 
+            color: #007bff; 
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .nav a:hover {
+            background-color: #f0f8ff;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 20px 0; 
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 12px; 
+            text-align: left; 
+        }
+        th { 
+            background-color: #f2f2f2; 
+            font-weight: bold;
+        }
+        tr:nth-child(even) { 
+            background-color: #f9f9f9; 
+        }
+        tr:hover {
+            background-color: #f0f8ff;
+        }
+        .hash-cell {
+            max-width: 300px;
+        }
+        .hash-display {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.85em;
+            word-break: break-all;
+            line-height: 1.4;
+            border: 1px solid #e9ecef;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+        .alert { 
+            padding: 10px; 
+            margin: 10px 0; 
+            border-radius: 5px; 
+        }
+        .alert-error { 
+            background-color: #f8d7da; 
+            color: #721c24; 
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 8px 15px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .back-link:hover {
+            background-color: #545b62;
+        }
+        .cert-count {
+            background-color: #e9ecef;
+            padding: 8px 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: inline-block;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>All Certificates</h1>
+    
+    <div class="nav">
+        <a href="{{ url_for('create_cert.homepage') }}">Home</a>
+        <a href="{{ url_for('create_cert.verify_certificate') }}">Verify Certificate</a>
+        <a href="{{ url_for('create_cert.view_certificate') }}">View Certificates</a>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    {% if certificates %}
+        <div class="cert-count">Total Certificates: {{ certificates|length }}</div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student Name</th>
+                    <th>Course</th>
+                    <th>Issued Date</th>
+                    <th>Certificate Hash</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cert in certificates %}
+                <tr>
+                    <td>{{ cert.id }}</td>
+                    <td>{{ cert.student_name }}</td>
+                    <td>{{ cert.course }}</td>
+                    <td>{{ cert.issued_date }}</td>
+                    <td class="hash-cell">
+                        <div class="hash-display">{{ cert.certificate_hash }}</div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No certificates found in the database.</p>
+    {% endif %}
+    
+    <a href="{{ url_for('create_cert.homepage') }}" class="back-link">Back to Home</a>
+</body>
+</html>
