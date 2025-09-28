@@ -1,156 +1,171 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>View Certificates</title>
-    <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 40px; 
-            background-color: #f5f5f5;
-        }
-        .nav { 
-            margin-bottom: 30px; 
-            background-color: #fff;
-            padding: 15px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .nav a { 
-            margin-right: 20px; 
-            text-decoration: none; 
-            color: #007bff; 
-            font-weight: bold;
-            padding: 8px 15px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-        .nav a:hover {
-            background-color: #f0f8ff;
-        }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin: 20px 0; 
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        th, td { 
-            border: 1px solid #ddd; 
-            padding: 12px; 
-            text-align: left; 
-        }
-        th { 
-            background-color: #f2f2f2; 
-            font-weight: bold;
-        }
-        tr:nth-child(even) { 
-            background-color: #f9f9f9; 
-        }
-        tr:hover {
-            background-color: #f0f8ff;
-        }
-        .hash-cell {
-            max-width: 300px;
-        }
-        .hash-display {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 4px;
-            font-family: monospace;
-            font-size: 0.85em;
-            word-break: break-all;
-            line-height: 1.4;
-            border: 1px solid #e9ecef;
-            max-height: 80px;
-            overflow-y: auto;
-        }
-        .alert { 
-            padding: 10px; 
-            margin: 10px 0; 
-            border-radius: 5px; 
-        }
-        .alert-error { 
-            background-color: #f8d7da; 
-            color: #721c24; 
-        }
-        h1 {
-            color: #333;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 10px;
-        }
-        .back-link {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 8px 15px;
-            background-color: #6c757d;
-            color: white;
-            text-decoration: none;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-        .back-link:hover {
-            background-color: #545b62;
-        }
-        .cert-count {
-            background-color: #e9ecef;
-            padding: 8px 15px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            display: inline-block;
-            font-weight: bold;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Certificates - Certificate Blockchain System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/view_certificate.css') }}">
 </head>
 <body>
-    <h1>All Certificates</h1>
-    
-    <div class="nav">
-        <a href="{{ url_for('create_cert.homepage') }}">Home</a>
-        <a href="{{ url_for('create_cert.verify_certificate') }}">Verify Certificate</a>
-        <a href="{{ url_for('create_cert.view_certificate') }}">View Certificates</a>
-    </div>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    
-    {% if certificates %}
-        <div class="cert-count">Total Certificates: {{ certificates|length }}</div>
+    <div class="container">
+        <header class="header">
+            <h1>View All Certificates</h1>
+            <p>Browse all certificates stored in the blockchain system</p>
+        </header>
         
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Student Name</th>
-                    <th>Course</th>
-                    <th>Issued Date</th>
-                    <th>Certificate Hash</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cert in certificates %}
-                <tr>
-                    <td>{{ cert.id }}</td>
-                    <td>{{ cert.student_name }}</td>
-                    <td>{{ cert.course }}</td>
-                    <td>{{ cert.issued_date }}</td>
-                    <td class="hash-cell">
-                        <div class="hash-display">{{ cert.certificate_hash }}</div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No certificates found in the database.</p>
-    {% endif %}
-    
-    <a href="{{ url_for('create_cert.homepage') }}" class="back-link">Back to Home</a>
+        <nav class="nav">
+            <a href="{{ url_for('create_cert.homepage') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('create_cert.verify_certificate') }}" class="nav-link">Verify Certificate</a>
+            <a href="{{ url_for('create_cert.view_certificate') }}" class="nav-link active">View Certificates</a>
+        </nav>
+        
+        <main class="main-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="messages">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+            
+            <div class="content-grid">
+                <section class="certificate-stats">
+                    <h2>Certificate Overview</h2>
+                    <div class="stats-container">
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-content">
+                                <h3>Total Certificates</h3>
+                                <p class="stat-number">{{ certificates|length if certificates else 0 }}</p>
+                                <span class="stat-label">Certificates in blockchain</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <section class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <div class="action-buttons">
+                        <a href="{{ url_for('create_cert.homepage') }}" class="action-link">
+                            <div class="action-card">
+                                <span class="action-icon">🏠</span>
+                                <span class="action-text">Back to Home</span>
+                            </div>
+                        </a>
+                        <a href="{{ url_for('create_cert.verify_certificate') }}" class="action-link">
+                            <div class="action-card">
+                                <span class="action-icon">🔍</span>
+                                <span class="action-text">Verify Certificate</span>
+                            </div>
+                        </a>
+                    </div>
+                </section>
+            </div>
+            
+            {% if certificates %}
+            <div class="certificates-table-container">
+                <table class="certificates-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Student Name</th>
+                            <th>Course</th>
+                            <th>Issued Date</th>
+                            <th>Certificate Hash</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cert in certificates %}
+                        <tr>
+                            <td class="cert-id">{{ cert.id }}</td>
+                            <td class="student-name">{{ cert.student_name }}</td>
+                            <td class="course">{{ cert.course }}</td>
+                            <td class="issued-date">{{ cert.issued_date }}</td>
+                            <td class="hash-cell">
+                                <div class="hash-display" title="{{ cert.certificate_hash }}">
+                                    {{ cert.certificate_hash[:20] }}...{{ cert.certificate_hash[-20:] }}
+                                </div>
+                                <button class="copy-hash-btn" data-hash="{{ cert.certificate_hash }}" title="Copy full hash">
+                                    📋
+                                </button>
+                            </td>
+                            <td class="actions">
+                                <a href="{{ url_for('create_cert.verify_certificate') }}?certificate_id={{ cert.id }}" 
+                                   class="verify-link" title="Verify this certificate">
+                                    🔍 Verify
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h3>No Certificates Found</h3>
+                <p>No certificates have been created yet. Start by creating your first certificate.</p>
+                <a href="{{ url_for('create_cert.homepage') }}" class="btn btn-primary">
+                    <span class="btn-icon">➕</span>
+                    Create First Certificate
+                </a>
+            </div>
+            {% endif %}
+        </main>
+        
+        <footer class="footer">
+            <p>&copy; 2025 Certificate Blockchain System. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+    // Copy hash functionality
+    document.querySelectorAll('.copy-hash-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const hash = this.getAttribute('data-hash');
+            navigator.clipboard.writeText(hash).then(() => {
+                // Show temporary feedback
+                const originalHTML = this.innerHTML;
+                this.innerHTML = '✓ Copied!';
+                this.style.backgroundColor = '#28a745';
+                
+                setTimeout(() => {
+                    this.innerHTML = originalHTML;
+                    this.style.backgroundColor = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy hash: ', err);
+            });
+        });
+    });
+
+    // Enhance table row interaction
+    document.querySelectorAll('.certificates-table tbody tr').forEach(row => {
+        row.addEventListener('click', function(e) {
+            // Don't trigger if user clicked on action buttons
+            if (!e.target.closest('.copy-hash-btn') && !e.target.closest('.verify-link')) {
+                this.classList.toggle('expanded');
+            }
+        });
+    });
+
+    // Responsive table handling
+    function handleTableResponsive() {
+        const tableContainer = document.querySelector('.certificates-table-container');
+        if (window.innerWidth < 768) {
+            tableContainer.classList.add('responsive');
+        } else {
+            tableContainer.classList.remove('responsive');
+        }
+    }
+
+    // Initial call and resize listener
+    handleTableResponsive();
+    window.addEventListener('resize', handleTableResponsive);
+    </script>
 </body>
 </html>
